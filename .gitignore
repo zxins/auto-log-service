@@ -119,3 +119,4 @@ dist
 .env.dev
 .idea
 .DS_Store
+package-lock.json
