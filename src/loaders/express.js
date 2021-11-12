@@ -2,7 +2,9 @@ const express = require('express')
 require('express-async-errors')
 const routes = require('../api/index')
 const cors = require('cors')
-const Config = require('../config/config')
+const bodyParser = require('body-parser')
+
+const config = require('../config/config')
 const {ApiException} = require('../utils/exception')
 const logger = require('../utils/logger')
 
@@ -26,12 +28,15 @@ module.exports = async (app) => {
     // 跨域资源访问
     app.use(cors())
 
+    // body-parser
+    app.use(bodyParser.json({limit: "50mb"}));
+    app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit: 50000}));
+
     // 将req.body原始字符串转换为json
-    app.use(express.json())
+    // app.use(express.json())
 
     // 加载api路由
-    app.use(Config.api.prefix, routes())   // Config.api.prefix,
-
+    app.use(config.api.prefix, routes())   // Config.api.prefix,
 
     // 异常处理
     app.use((err, req, res, next) => {
@@ -42,6 +47,9 @@ module.exports = async (app) => {
                 "r": err.r,
             })
         }
+
+        process.env.NODE_ENV === 'dev' ? console.log(err) : logger.error(err)
+
         // 未知异常返回500，不暴露异常内容
         return res.status(500).json({
             "code": 1,
@@ -50,4 +58,6 @@ module.exports = async (app) => {
         })
 
     })
+
+
 }
