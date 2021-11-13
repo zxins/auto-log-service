@@ -26,5 +26,5 @@ async function testSearchByPage() {
 
 // testPing()
 // testCatIndices('yml')
-testIndex()
-// testSearchByPage()
+// testIndex()
+testSearchByPage()

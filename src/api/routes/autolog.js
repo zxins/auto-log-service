@@ -20,11 +20,22 @@ module.exports = (app) => {
 
         const esServ = new ElasticSearchService()
         const info = await esServ.getIndexInfo(index)
-        return res.json({r: {info}, 'msg': '', code: 0})
+        return res.json({r: info, 'msg': '', code: 0})
     })
 
+    // get index mappings
+    router.get('/:date/mappings', async (req, res, next) => {
+        const date = req.params.date
+        const index = indexPrefix + moment(date).format('YYYY.MM.DD')
+
+        const esServ = new ElasticSearchService()
+        const info = await esServ.getIndexInfo(index)
+        return res.json({r: info.mappings.properties, 'msg': '', code: 0})
+    })
+
+
     // paginate search hits by match
-    router.get('/:date/hits', async (req, res, next) => {
+    router.post('/:date/hits', async (req, res, next) => {
         logger.debug(
             `Calling auto_log_date endpoint with \nbody: %o \nparams: %o \nquery: %o`, req.body, req.params, req.query
         );

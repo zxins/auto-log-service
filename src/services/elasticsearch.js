@@ -41,7 +41,8 @@ class ElasticSearchService {
      * @returns {Promise<*>}
      */
     async getIndexInfo(index) {
-        return await this.client.indices.get({index: index})
+        const info = await this.client.indices.get({index: index})
+        return info[index]
     }
 
     /**
@@ -86,7 +87,7 @@ class ElasticSearchService {
             })
 
             return {
-                results: result.hits.hits,
+                items: result.hits.hits,
                 totalCount: count.count,
                 page: page,
                 perPage: perPage
@@ -94,7 +95,7 @@ class ElasticSearchService {
         } catch (e) {
             if (e.statusCode === 404) {
                 logger.info(`Index not found: ${index}`)
-                return {results: [], totalCount: 0, page: page, perPage: perPage}
+                return {items: [], totalCount: 0, page: page, perPage: perPage}
             }
             throw e
         }
