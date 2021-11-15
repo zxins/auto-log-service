@@ -22,7 +22,7 @@ function testPaginateHits(query) {
     const date = moment(timestamp).format('yyyy-MM-DD')
     const url = `${root}/${date}/hits`
 
-    axios.get(url, {}).then((res) => {
+    axios.post(url, {}).then((res) => {
         const items = res.data.r
         console.log('%o', items)
         return items
@@ -30,7 +30,7 @@ function testPaginateHits(query) {
 }
 
 const query = {
-    timestamp: '2021-11-13 15:00:00'
+    timestamp: '2021-11-15 15:00:00'
 }
 // testGetInfo(query)
 testPaginateHits(query)

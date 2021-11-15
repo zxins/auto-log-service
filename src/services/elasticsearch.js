@@ -2,6 +2,7 @@ const elasticsearch = require('elasticsearch')
 const lodash = require('lodash')
 const config = require('../config/config')
 const logger = require('../utils/logger')
+const Console = require("console");
 
 class ElasticSearchService {
     constructor(
@@ -41,8 +42,18 @@ class ElasticSearchService {
      * @returns {Promise<*>}
      */
     async getIndexInfo(index) {
-        const info = await this.client.indices.get({index: index})
-        return info[index]
+        try {
+            const info = await this.client.indices.get({index: index})
+            return info[index].mappings.properties
+        } catch (e) {
+            if (e.statusCode === 404) {
+                if (e.statusCode === 404) {
+                    logger.info(`Index not found: ${index}`)
+                    return {}
+                }
+                throw e
+            }
+        }
     }
 
     /**
@@ -61,29 +72,52 @@ class ElasticSearchService {
     /**
      * 分页条件查询文档
      * @param index 索引
-     * @param match 匹配键值对 {k: v}
+     * @param must 键值对儿列表 [[ke1, val1], [key2, val2], ...]
+     * @param range 查询范围, 需要声明字段 eg: { "timestamp": {"gte": 1636774293, "lte": 1636774353}}
      * @param page 页数
      * @param perPage 每页显示数
      * @returns {Promise<{perPage: number, page: number, totalCount, results: *}>}
      */
-    async paginateSearchByMatch(index, match = {}, page = 1, perPage = 10) {
-        const matchKey = lodash.isEmpty(match) ? 'match_all' : 'match'  // 自动转全匹配
-        let query = {}
-        query[matchKey] = match
-        const from = (page - 1) * perPage
+    async paginateSearchByMatch(index, must = [], range = {}, page = 1, perPage = 10) {
+        // query: { bool: { must: [ { match: { key: val } }, { match: { key: val }, ... } ] } }
+        let query = {
+            bool: {
+                must: [],
+                filter: {
+                    range: range
+                }
+            }
+        }
+        must.forEach((pair) => {
+            let matchObj = {
+                match: {}
+            }
+            matchObj.match[pair[0]] = pair[1]
+            query.bool.must.push(matchObj)
+        })
+        console.log(query)
 
         try {
             // 分页查询结果
+            const from = (page - 1) * perPage
             const result = await this.client.search({
                 index: index,
-                body: {query: query},
+                body: {
+                    query: query,
+                    sort: {
+                        "@timestamp": {
+                            order: "desc"
+                        }
+                    }
+                },
                 from: from,
-                size: perPage
+                size: perPage,
+
             })
             // 符合匹配条件的总数
             const count = await this.client.count({
                 index: index,
-                body: {query: query},
+                body: {query},
             })
 
             return {

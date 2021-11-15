@@ -19,7 +19,11 @@ async function testIndex() {
 }
 
 async function testSearchByPage() {
-    const result = await esServ.paginateSearchByMatch('shopping')
+    const matches = [
+        ['env', 'test'],
+        ['level', 'WARNING']
+    ]
+    const result = await esServ.paginateSearchByMatch('auto-logs-2021.11.13', matches)
     console.log(JSON.stringify(result))
 }
 

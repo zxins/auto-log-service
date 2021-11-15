@@ -30,7 +30,7 @@ module.exports = (app) => {
 
         const esServ = new ElasticSearchService()
         const info = await esServ.getIndexInfo(index)
-        return res.json({r: info.mappings.properties, 'msg': '', code: 0})
+        return res.json({r: info, 'msg': '', code: 0})
     })
 
 
@@ -42,13 +42,14 @@ module.exports = (app) => {
 
         const date = req.params.date
         const index = indexPrefix + moment(date).format('YYYY.MM.DD')
-        const match = req.body.match || {}
+        const match = req.body.must || []
+        const range = req.body.range || {}
         const page = req.query.page || 1
         const perPage = req.query.perPage || 10
 
 
         const esServ = new ElasticSearchService()
-        const pagination = await esServ.paginateSearchByMatch(index, match, page, perPage)
+        const pagination = await esServ.paginateSearchByMatch(index, match, range, page, perPage)
 
         return res.json({r: pagination, msg: '', code: 0})
     })
