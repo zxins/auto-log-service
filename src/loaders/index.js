@@ -1,10 +1,11 @@
 const expressLoader = require('./express')
-const mongooseLoader = require('./mongoose')
+const {db, localDb} = require('./mongoose')
 
 module.exports = async (app) => {
     await expressLoader(app)
     console.log('Express loaded')
 
-    await mongooseLoader(app)
+    // await db(app)
+    await localDb(app)
     console.log('Mongoose loaded')
 }

@@ -1,4 +1,4 @@
-const db = require('../../src/loaders/mongoose')
+const {db} = require('../../src/loaders/mongoose')
 const mongoose = require('mongoose')
 const {BatchService} = require('../../src/services/batch')
 await db()

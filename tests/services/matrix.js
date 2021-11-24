@@ -1,4 +1,4 @@
-const db = require('../../src/loaders/mongoose')
+const {db} = require('../../src/loaders/mongoose')
 const mongoose = require('mongoose')
 const {MatrixService} = require('../../src/services/matrix')
 const {BatchService} = require("../../src/services/batch");

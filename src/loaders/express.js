@@ -1,9 +1,7 @@
-const express = require('express')
 require('express-async-errors')
 const routes = require('../api/index')
 const cors = require('cors')
 const bodyParser = require('body-parser')
-
 const config = require('../config/config')
 const {ApiException} = require('../utils/exception')
 const logger = require('../utils/logger')
@@ -47,7 +45,13 @@ module.exports = async (app) => {
                 "r": err.r,
             })
         }
-
+        if (err.status === 401) {
+            return res.status(401).json({
+                r: {},
+                errMsg: '请先登录',
+                code: 401
+            })
+        }
         process.env.NODE_ENV === 'dev' ? console.log(err) : logger.error(err)
 
         // 未知异常返回500，不暴露异常内容
@@ -58,6 +62,5 @@ module.exports = async (app) => {
         })
 
     })
-
 
 }

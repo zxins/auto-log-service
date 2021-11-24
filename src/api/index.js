@@ -4,6 +4,7 @@ const autoLog = require('./routes/autolog')
 const batch = require('./routes/batch')
 const record = require('./routes/record')
 const data = require('./routes/data')
+const user = require('./routes/user')
 
 module.exports = (app) => {
     const router = Router()
@@ -12,6 +13,7 @@ module.exports = (app) => {
     batch(router)
     record(router)
     data(router)
+    user(router)
 
     return router
 }
