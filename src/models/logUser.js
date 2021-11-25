@@ -11,13 +11,19 @@ const schema = new mongoose.Schema({
             return bcrypt.hashSync(val, 10) // 加密算法
         }
     },
+    name: String,   // 真实姓名
+    avatar: String, // 头像
     memo: String,   // 备注
     roles: {
         type: String,
         default: '',
         set(val) {
-            assert(val instanceof Array, '类型错误, roles应是一个Array')
-            return val.join(',')
+            // assert(val instanceof Array, '类型错误, roles应是一个Array')
+            if (val instanceof Array){
+                return val.join(',')
+            }else if (val instanceof String){
+                return val
+            }
         },
         get(val) {
             return val ? val.split(',') : []
@@ -27,8 +33,12 @@ const schema = new mongoose.Schema({
         type: String,
         default: '',
         set(val) {
-            assert(val instanceof Array, '类型错误, cities应是一个Array')
-            return val.join(',')
+            // assert(val instanceof Array, '类型错误, cities应是一个Array')
+            if (val instanceof Array){
+                return val.join(',')
+            }else if (val instanceof String){
+                return val
+            }
         },
         get(val) {
             return val.split(',')

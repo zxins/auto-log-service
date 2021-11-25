@@ -30,4 +30,4 @@ function batchesMatrixAPiTest(){
     })
 }
 
-batchesMatrixAPiTest()
+batchInfoApiTest()

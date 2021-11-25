@@ -6,6 +6,6 @@ module.exports = async (app) => {
     console.log('Express loaded')
 
     // await db(app)
-    await localDb(app)
+    await db(app)
     console.log('Mongoose loaded')
 }

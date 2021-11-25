@@ -16,7 +16,7 @@ class MatrixService {
 
     async search(page, pageSize, options) {
         options = options || {}
-        return  DispatchMatrix.aggregate([
+        return await DispatchMatrix.aggregate([
             {$match: options},
             {$sort: {time: -1}},
             {$skip: (page - 1) * pageSize},

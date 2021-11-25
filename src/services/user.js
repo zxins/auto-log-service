@@ -29,8 +29,9 @@ class UserService {
 
         const payload = {
             exp: exp.getTime() / 1000,
+            user: user
         }
-        Object.assign(payload, user)
+        // Object.assign(payload, user)
 
         return await signData(payload)
     }
@@ -49,6 +50,10 @@ class UserService {
         }
     }
 
+    async info(id) {
+        return await UserModel.findById(id).exec()
+    }
+
     async count(options) {
         options = options || {};
         return await UserModel.count(options)
@@ -62,6 +67,9 @@ class UserService {
             .limit(pageSize).exec();
     }
 
+    async update(id, options) {
+        return await UserModel.updateOne({_id: id}, {'$set': options}).exec()
+    }
 }
 
 module.exports = {UserService}

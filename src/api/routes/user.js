@@ -1,8 +1,6 @@
 const {Router} = require('express')
-const logger = require('../../utils/logger')
 const middlewares = require('../middlewares/index')
 const {UserService} = require('../../services/user')
-const {next} = require("lodash/seq");
 
 const router = Router()
 
@@ -13,12 +11,20 @@ module.exports = (app) => {
     router.post('/register', async (req, res, next) => {
         const username = req.body.username
         const password = req.body.password
+        const name = req.body.name || ''
+        const roles = req.body.roles || []
+        const cities = req.body.cities || []
+        const avatar = req.body.avatar
         const memo = req.body.memo
 
         const options = {}
         options.username = username
         options.password = password
-        options.memo = memo
+        options.name = name
+        options.roles = roles
+        options.cities = cities
+        if (memo) options.memo = memo
+        if (avatar) options.avatar = avatar
 
         const userServ = new UserService()
         await userServ.register(options)
@@ -36,17 +42,18 @@ module.exports = (app) => {
     })
 
     router.get('/info', middlewares.isAuth, async (req, res, next) => {
+        const userServ = new UserService()
+        let info = await userServ.info(req.token.user._id)
+        const result = info.toObject()
+        result.roles = info.roles || []
+        result.cities = info.cities || []
+
+        result.avatar = 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif'
         return res.json({
-            r: {
-                roles: ['admin'],
-                introduction: 'I am an admin',
-                avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-                name: 'Normal Editor'
-            }, msg: '', code: 0
+            r: result, msg: '', code: 0
         })
 
     })
-
 
     router.post('/logout', middlewares.isAuth, async (req, res, next) => {
         return res.json({r: {}, msg: 'logout success', code: 0})
@@ -60,6 +67,29 @@ module.exports = (app) => {
 
         const userServ = new UserService()
         const users = await userServ.search(page, pageSize, options)
-        return res.json({r: {users: users},})
+        return res.json({r: {users: users}, msg: '', code: 0})
+    })
+
+    router.put('/:uid', middlewares.isAuth, async (req, res, next) => {
+        const roles = req.body.roles
+        const cities = req.body.cities
+        const avatar = req.body.avatar
+        const name = req.body.name
+        const memo = req.body.memo
+        const password = req.body.password
+
+        const options = {}
+        if (roles) options.roles = roles
+        if (cities) options.cities = cities
+        if (avatar) options.avatar = avatar
+        if (name) options.name = name
+        if (memo) options.memo = memo
+        if (password) options.password = password
+
+        const uid = req.params.uid
+        const userServ = new UserService()
+        await userServ.update(uid, options)
+        return res.json({r: {}, msg: '更新成功', code: 0})
+
     })
 }
