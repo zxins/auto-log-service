@@ -3,7 +3,7 @@ const moment = require('moment')
 const logger = require("../../utils/logger")
 const {MatrixService} = require('../../services/matrix')
 const {BatchService} = require('../../services/batch')
-
+const middlewares = require('../middlewares')
 
 const router = Router()
 
@@ -13,7 +13,7 @@ module.exports = (app) => {
     const batchServ = new BatchService()
 
     //  获取批次指派详情 /batches?id=xxx
-    router.get('', async (req, res, next) => {
+    router.get('', middlewares.isAuth, async (req, res, next) => {
         const id = req.query.id
         let item = await matrixServ.info(id, true)
         item = item.toObject()
@@ -36,7 +36,7 @@ module.exports = (app) => {
     })
 
     // 条件查询批次列表 /batches/search?city=xx&orderId=xx&...&page=1&pageSize=100...
-    router.get('/search', async (req, res, next) => {
+    router.get('/search', middlewares.isAuth, async (req, res, next) => {
         const page = parseInt(req.query.page || 1)
         const pageSize = parseInt(req.query.rows || 50)
         const options = {}

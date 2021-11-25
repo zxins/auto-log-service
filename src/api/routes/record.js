@@ -1,5 +1,6 @@
 const {Router} = require('express')
 const {RecordService} = require('../../services/record')
+const middlewares = require('../middlewares/index')
 
 
 const router = Router()
@@ -8,7 +9,7 @@ module.exports = (app) => {
     app.use('/records', router)
 
 
-    router.get('/search', async (req, res, next) => {
+    router.get('/search', middlewares.isAuth, async (req, res, next) => {
         const page = parseInt(req.query.page || 1)
         const pageSize = parseInt(req.query.rows || 50)
 
@@ -17,9 +18,9 @@ module.exports = (app) => {
         const city = req.query.city
         const batchId = req.query.batchId
 
-        if(env) options.env = env
-        if(city) options.cityId = parseInt(city)
-        if(batchId) options.batchId = batchId
+        if (env) options.env = env
+        if (city) options.cityId = parseInt(city)
+        if (batchId) options.batchId = batchId
 
         const recordServ = new RecordService()
         const count = await recordServ.count(options);
@@ -28,7 +29,7 @@ module.exports = (app) => {
         return res.json({r: {total: count, rows: records}, msg: '', code: 0})
     })
 
-    router.get('/', async (req, res, next) => {
+    router.get('/', middlewares.isAuth, async (req, res, next) => {
         const id = req.query.id;
 
         const recordServ = new RecordService()
